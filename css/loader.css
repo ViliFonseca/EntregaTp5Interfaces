@@ -1,0 +1,100 @@
+
+/* =========================================
+   VARIABLES GLOBALES
+========================================= */
+
+:root {
+  --accent1: #FFECB3;
+  --accent2: #FFD54F;
+  --accent3: #FFC107;
+  --accent4: #FFA000;
+  --accent5: #FF8F00;
+
+  --secondary1: #2D2929;
+  --secondary2: #130E12;
+  --secondary3: #160B14;
+
+  --terciary1: #B9B9B9;
+  --terciary2: #969696;
+  --terciary3: #717070;
+  --terciary4: #DEDDDD;
+  --terciary5: #FFFEFE;
+
+  --primary1: #9E1C7E;
+  --primary2: #7E0D62;
+  --primary3: #610049;
+  --primary4: #AA3A8E;
+  --primary5: #C261AA;
+}
+
+/* ============= LOADER OVERLAY ============= */
+#app-loader {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, var(--secondary3) 0%, var(--secondary2) 100%);
+  z-index: 9999; /*prioridad maxima*/
+  color: var(--terciary4);
+  flex-direction: column;
+  gap: 20px;
+  transition: opacity 300ms ease, visibility 300ms ease;
+}
+
+#app-loader.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loader-inner {
+  display: flex;
+  gap: 26px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ============= CÍRCULO DE PROGRESO ============= */
+.progress-ring {
+  width: 96px;
+  height: 96px;
+  position: relative;
+  display: inline-block;
+}
+
+.progress-ring svg {
+  transform: rotate(-90deg);
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.progress-ring circle.track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.12);
+  stroke-width: 8;
+}
+
+.progress-ring circle.progress {
+  fill: none;
+  stroke: var(--primary1);
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 50ms linear;
+}
+
+/* ============= TEXTO ============= */
+.loader-text {
+  text-align: center;
+}
+.loader-text .percent {
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.loader-text .sub {
+  margin-top: 6px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+}
