@@ -1675,32 +1675,20 @@ section h2 {
   z-index: 1;
 }
 
-#fondo {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 200%;
-  height: 100%;
-  background: url('../img/Flappy/fondo.jpg') repeat-x;
-  background-size: contain;
-  animation: moveBackground 10s linear infinite;
-  z-index: 1;
-}
-
 @keyframes moveBackground {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
-
+/*CAMBIAR PISO POR OTRO ASSET MEJOR*/
 #piso {
   position: absolute;
   bottom: 0;
   left: 0;
   width: 200%;
   height: 100px; 
-  background: url('../img/Flappy/piso.png') repeat-x;
+  background: url('../img/Flappy/piso.png') ;
   animation: moveGround 3s linear infinite;
-  z-index: 3; 
+  z-index: 10; 
 }
 
 @keyframes moveGround {
@@ -1714,7 +1702,7 @@ section h2 {
   width: 83px;
   height: 119px;
   background: url('../img/Flappy/flappy.png');
-  z-index: 2;
+  z-index: 11;
   transform: scaleX(-1);
 }
 
@@ -1726,10 +1714,13 @@ section h2 {
   0% { background-position: 0px; }
   100% { background-position: -500px}
 }
+
+
+/*CAMBIAR TUBERIAS POR OTRO ASSET MEJOR*/
 .pipe {
  position: absolute;
  image-rendering: pixelated;
- z-index: 10;
+ z-index: 9;
 }
 
 .pipe.top {
@@ -1745,9 +1736,92 @@ section h2 {
   background-image: url('../img/Flappy/calvoMuerte.png') ;
   width: 100px;
   height: 100px;
-  animation: deathAnimation 0.8s steps(7) forwards;
+  animation: deathAnimation 0.8s steps(7  ) forwards;
 }
 @keyframes deathAnimation {
    0% { background-position: 0px; }
   100% { background-position: -700px}
+}
+
+
+.layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 300%;                 /* controla la forma del loop */
+  height: 100%;
+  background-repeat: repeat-x;
+  background-size: auto 100%;  /* evita deformaciones */
+  background-position: 0 0;
+  pointer-events: none;
+  z-index: 0;
+}
+#bg-sky {
+  background-image: url('../img/Flappy/cielo.png');
+}
+
+#bg-mountains {
+  background-image: url('../img/Flappy/montaña.png');
+}
+
+#bg-clouds {
+  background-image: url('../img/Flappy/nubes.png');
+}
+
+#bg-forest-front {
+  background-image: url('../img/Flappy/arboles.png');
+  top: -90px;
+}
+
+/* KEYFRAMES */
+@keyframes moveSky {
+  from { background-position: 0 0; }
+  to   { background-position: -1000px 0; }
+}
+@keyframes moveMountains {
+  from { background-position: 0 0; }
+  to   { background-position: -1500px 0; }
+}
+@keyframes moveClouds {
+  from { background-position: 0 0; }
+  to   { background-position: -2000px 0; }
+}
+@keyframes moveForestFront {
+  from { background-position: 0 0; }
+  to   { background-position: -3000px 0; }
+}
+
+/* =========================================
+   PUNTAJE Y MONEDAS (FLAPPY)
+========================================= */
+
+/* Estilo del contador de puntos */
+#score-display {
+  position: absolute;
+  top: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Impact', sans-serif;
+  font-size: 40px;
+  color: white;
+  text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+  z-index: 20;
+  pointer-events: none;
+  display: none;
+}
+
+/* Estilo de la moneda */
+.coin {
+  position: absolute;
+  width: 30px;
+  height: 30px; 
+  background-image: url('../img/Flappy/MonedaD.png'); /* Asegúrate de tener esta imagen */
+  background-repeat: no-repeat;
+  z-index: 9;
+  animation: spinCoin 0.8s steps(5) infinite; 
+}
+
+@keyframes spinCoin {
+  from { background-position: 0px; }
+  to { background-position: -150px; }
 }
