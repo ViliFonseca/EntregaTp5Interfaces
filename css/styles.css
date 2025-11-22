@@ -1679,21 +1679,24 @@ section h2 {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
-/*CAMBIAR PISO POR OTRO ASSET MEJOR*/
 #piso {
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 200%;
+  width: 100%;
   height: 100px; 
-  background: url('../img/Flappy/piso.png') ;
+  background: url('../img/Flappy/piso1.png');
+  background-repeat: repeat-x; 
+  background-size: auto 100px;
+  image-rendering: pixelated; 
+
   animation: moveGround 3s linear infinite;
   z-index: 10; 
 }
 
 @keyframes moveGround {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  from { background-position-x: 0px; }
+  to { background-position-x: -438px; } 
 }
 #calvo {
   position: absolute;
@@ -1748,10 +1751,10 @@ section h2 {
   position: absolute;
   top: 0;
   left: 0;
-  width: 300%;                 /* controla la forma del loop */
+  width: 300%;              
   height: 100%;
   background-repeat: repeat-x;
-  background-size: auto 100%;  /* evita deformaciones */
+  background-size: auto 100%;  
   background-position: 0 0;
   pointer-events: none;
   z-index: 0;
@@ -1775,27 +1778,25 @@ section h2 {
 
 /* KEYFRAMES */
 @keyframes moveSky {
-  from { background-position: 0 0; }
-  to   { background-position: -1000px 0; }
+  from { background-position: 0; }
+  to   { background-position: -1000px; }
 }
 @keyframes moveMountains {
-  from { background-position: 0 0; }
-  to   { background-position: -1500px 0; }
+  from { background-position: 0; }
+  to   { background-position: -1500px; }
 }
 @keyframes moveClouds {
-  from { background-position: 0 0; }
-  to   { background-position: -2000px 0; }
+  from { background-position: 0; }
+  to   { background-position: -2000px; }
 }
 @keyframes moveForestFront {
-  from { background-position: 0 0; }
-  to   { background-position: -3000px 0; }
+  from { background-position: 0; }
+  to   { background-position: -3000px; }
 }
 
 /* =========================================
    PUNTAJE Y MONEDAS (FLAPPY)
 ========================================= */
-
-/* Estilo del contador de puntos */
 #score-display {
   position: absolute;
   top: 5%;
@@ -1805,7 +1806,7 @@ section h2 {
   font-size: 40px;
   color: white;
   text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-  z-index: 20;
+  z-index: 100; 
   pointer-events: none;
   display: none;
 }

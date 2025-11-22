@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const howToPlayBtn = document.getElementById("howToPlayBtn");
     const closeHowToPlay = document.getElementById("closeHowToPlay");
     
-    // Referencias nuevas para el GAME OVER
+    // Referencias para el GAME OVER
     const endMenu = document.getElementById("endMenu");
     const endMessage = document.getElementById("endMessage");
     const restartGameBtn = document.getElementById("restartGameBtn");
@@ -37,64 +37,71 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- 1. FLUJO DE MENÚS ---
 
     // Portada -> Menú Inicio
-    playButton.addEventListener("click", () => {
-        if (previewImage) previewImage.style.display = "none";
-        switchScreens(overlay, startMenu, 300);
-    });
+    if(playButton) {
+        playButton.addEventListener("click", () => {
+            if (previewImage) previewImage.style.display = "none";
+            switchScreens(overlay, startMenu, 300);
+        });
+    }
 
     // Menú Inicio -> Jugar
-    startGameBtn.addEventListener("click", () => {
-        startMenu.style.opacity = "0";
-        setTimeout(() => {
-            startMenu.style.display = "none";
-            gameContainer.style.display = "block"; 
-            gameContainer.style.opacity = "1";
-            scoreDisplay.style.display = "block";
-            
-            initGameLogic(); 
-        }, 300);
-    });
+    if(startGameBtn) {
+        startGameBtn.addEventListener("click", () => {
+            startMenu.style.opacity = "0";
+            setTimeout(() => {
+                startMenu.style.display = "none";
+                gameContainer.style.display = "block"; 
+                gameContainer.style.opacity = "1";
+                scoreDisplay.style.display = "block";
+                
+                initGameLogic(); 
+            }, 300);
+        });
+    }
 
     // Botón Reintentar (Del menú de derrota)
-    restartGameBtn.addEventListener("click", () => {
-        // Ocultamos el menú de derrota
-        endMenu.style.opacity = "0";
-        setTimeout(() => {
-            endMenu.style.display = "none";
-            // Aseguramos que el contenedor del juego esté visible
-            gameContainer.style.display = "block"; 
-            scoreDisplay.style.display = "block";
-            // Reiniciamos la lógica
-            initGameLogic();
-        }, 300);
-    });
+    if(restartGameBtn) {
+        restartGameBtn.addEventListener("click", () => {
+            // Ocultamos el menú de derrota
+            endMenu.style.opacity = "0";
+            setTimeout(() => {
+                endMenu.style.display = "none";
+                // Aseguramos que el contenedor del juego esté visible
+                gameContainer.style.display = "block"; 
+                scoreDisplay.style.display = "block";
+                // Reiniciamos la lógica
+                initGameLogic();
+            }, 300);
+        });
+    }
 
     // --- 2. BOTONES "CÓMO JUGAR" ---
-    howToPlayBtn.addEventListener("click", () => {
-        howToPlay.style.display = "flex";
-    });
+    if(howToPlayBtn) {
+        howToPlayBtn.addEventListener("click", () => {
+            howToPlay.style.display = "flex";
+        });
+    }
     
-    closeHowToPlay.addEventListener("click", () => {
-        howToPlay.style.display = "none";
-    });
+    if(closeHowToPlay) {
+        closeHowToPlay.addEventListener("click", () => {
+            howToPlay.style.display = "none";
+        });
+    }
 
     // --- 3. CONFIGURACIÓN INICIAL JUEGO ---
     const calvo = document.getElementById("calvo");
     const piso = document.getElementById("piso");
-    const gameScreen = document.querySelector(".game-screen");
+    // const gameScreen = document.querySelector(".game-screen"); // Usaremos gameContainer directamente para cálculos
     
     // Físicas y estado
     const gravity = 0.5;
     const jump = -8;
-    const hitboxPadding = 30; 
-    
+    const hitboxPadding = 10;
     let calvoY, velocity, gameLoopId, obstacleInterval;
     let gameRunning = false;
     let score = 0;
-    let calvoWidth = calvo.clientWidth || 50; 
-    let calvoHeight = calvo.clientHeight || 50;
-    
-    // Posición X fija del personaje
+    let calvoWidth = 50; 
+    let calvoHeight = 50;
     const calvoX = 100; 
 
     // Pipes y Monedas
@@ -116,9 +123,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
     
-    document.addEventListener("click", jumpAction);
+    gameContainer.addEventListener("mousedown", jumpAction);
     document.addEventListener("keydown", (e) => {
-        if (e.code === "Space" || e.code === "ArrowUp") jumpAction(e);
+        if (e.code === "Space" || e.code === "ArrowUp") {
+            e.preventDefault();
+            jumpAction(e);
+        }
     });
 
     // ====================================================
@@ -126,8 +136,23 @@ document.addEventListener("DOMContentLoaded", () => {
     // ====================================================
 
     function initGameLogic() {
-        calvoWidth = calvo.clientWidth;
-        calvoHeight = calvo.clientHeight;
+        if(calvo) {
+            calvoWidth = calvo.clientWidth;
+            calvoHeight = calvo.clientHeight;
+        }
+
+        // Limpieza Profunda: Eliminar elementos del DOM primero
+        pipes.forEach(pipe => {
+            if(pipe.topPipe.parentNode) pipe.topPipe.remove();
+            if(pipe.bottomPipe.parentNode) pipe.bottomPipe.remove();
+        });
+        coins.forEach(coin => {
+            if(coin.el.parentNode) coin.el.remove();
+        });
+
+        // Vaciar Arrays
+        pipes.length = 0;
+        coins.length = 0;
 
         // Reiniciar variables
         calvoY = 150;
@@ -147,27 +172,16 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll(".layer").forEach(l => {
             l.dataset.pos = "0";
             l.style.backgroundPosition = "0px 0px";
+            l.dataset.paused = "false"; // Asegurar que no estén pausados
         });
-        resumeParallax();
-
-        // Limpiar tuberías anteriores
-        pipes.forEach(pipe => {
-            if(pipe.topPipe.parentNode) pipe.topPipe.remove();
-            if(pipe.bottomPipe.parentNode) pipe.bottomPipe.remove();
-        });
-        pipes.length = 0;
-
-        // Limpiar monedas anteriores
-        coins.forEach(coin => {
-            if(coin.el.parentNode) coin.el.remove();
-        });
-        coins.length = 0;
 
         gameRunning = true;
 
+        // Asegurar que no haya loops previos corriendo
         if (gameLoopId) cancelAnimationFrame(gameLoopId);
+        if (obstacleInterval) clearInterval(obstacleInterval);
+
         gameLoop();
-        
         startObstacleGenerator();
     }
 
@@ -192,8 +206,14 @@ document.addEventListener("DOMContentLoaded", () => {
         parallaxLayers.forEach(layer => {
             const el = document.getElementById(layer.id);
             if (!el || el.dataset.paused === "true") return;
+            
             let pos = parseFloat(el.dataset.pos || "0");
             pos -= pipespeed * layer.speed; 
+            
+            // Reiniciar posición para evitar números gigantes (loop visual)
+            // Asumimos que el background se repite
+            if (pos <= -3000) pos = 0; 
+
             el.dataset.pos = pos;
             el.style.backgroundPosition = `${pos}px 0px`;
         });
@@ -203,23 +223,17 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll(".layer").forEach(layer => layer.dataset.paused = "true");
     }
 
-    function resumeParallax() {
-        document.querySelectorAll(".layer").forEach(layer => layer.dataset.paused = "false");
-    }
-
     // ====================================================
     //  GAME LOOP
     // ====================================================
     function gameLoop() {
         if (!gameRunning) return;
-
-        // Física
         velocity += gravity;
         calvoY += velocity;
 
-        const gameHeight = gameScreen.clientHeight;
+        const gameHeight = gameContainer.clientHeight;
         const pisoHeight = piso.clientHeight;
-        const floorLimit = gameHeight - pisoHeight - calvoHeight;
+        const floorLimit = gameHeight - pisoHeight - calvoHeight + 10; 
 
         // Colisión Suelo
         if (calvoY > floorLimit) {
@@ -227,8 +241,6 @@ document.addEventListener("DOMContentLoaded", () => {
             muertePelado();
             return;
         }
-
-        // Colisión Techo
         if (calvoY < 0) { 
             calvoY = 0;
             velocity = 0;
@@ -241,7 +253,6 @@ document.addEventListener("DOMContentLoaded", () => {
         calvo.style.top = calvoY + "px";
         gameLoopId = requestAnimationFrame(gameLoop);
     }
-
     // ====================================================
     //  GENERADOR DE OBSTÁCULOS
     // ====================================================
@@ -249,11 +260,15 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!gameRunning) return;
 
         const pipeGap = 170; 
-        const gameHeight = gameScreen.clientHeight;
+        const gameHeight = gameContainer.clientHeight;
         const pisoHeight = piso.clientHeight;
 
         const minHeight = 50;
         const maxHeight = gameHeight - pisoHeight - pipeGap - minHeight;
+        
+        // Evitar errores si la pantalla es muy chica
+        if (maxHeight < minHeight) return; 
+
         const pipeTopHeight = Math.floor(Math.random() * (maxHeight - minHeight + 1)) + minHeight;
 
         const bottomPipeTop = pipeTopHeight + pipeGap;
@@ -261,7 +276,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Crear elementos DOM
         const topPipe = document.createElement("img");
-        topPipe.src = "img/Flappy/pipe-top.png";
+        topPipe.src = "img/Flappy/pipe-top.png"; 
         topPipe.classList.add("pipe", "top");
         topPipe.style.height = pipeTopHeight + "px";
         topPipe.style.left = gameContainer.clientWidth + "px";
@@ -350,7 +365,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function updateScoreUI() {
-        scoreDisplay.innerText = score;
+        if(scoreDisplay) scoreDisplay.innerText = score;
     }
 
     function collectCoin(coin) {
@@ -365,6 +380,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const calvoBottom = calvoY + calvoHeight - hitboxPadding;
         const calvoLeft = calvoX + hitboxPadding;
         const calvoRight = calvoX + calvoWidth - hitboxPadding;
+        
         const pipeLeft = pipe.x;
         const pipeRight = pipe.x + pipeWidth;
         const topPipeBottom = pipe.pipeTopHeight;
@@ -397,23 +413,27 @@ document.addEventListener("DOMContentLoaded", () => {
     function muertePelado() {
         if (!gameRunning) return;
         gameRunning = false;
+        
         if (gameLoopId) cancelAnimationFrame(gameLoopId);
         if (obstacleInterval) clearInterval(obstacleInterval);
+        
         calvo.classList.add("dead");
         piso.style.animationPlayState = "paused";
         pauseParallax();
-        // Mostrar menú de derrota
+        
         showEndMenu();
     }
 
     function showEndMenu() {
-        endMessage.innerText = `Hiciste un total de ${score} puntos`;
-        scoreDisplay.style.display = "none";
-        // Mostrar el menú con transición
-        endMenu.style.display = "flex";
-        setTimeout(() => {
-            endMenu.style.opacity = "1";
-        }, 10);
+        if(endMessage) endMessage.innerText = `Hiciste un total de ${score} puntos`;
+        if(scoreDisplay) scoreDisplay.style.display = "none";
+        
+        if(endMenu) {
+            endMenu.style.display = "flex";
+            setTimeout(() => {
+                endMenu.style.opacity = "1";
+            }, 10);
+        }
     }
 
 });
