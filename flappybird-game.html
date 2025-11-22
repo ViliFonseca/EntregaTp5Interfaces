@@ -214,6 +214,7 @@
       <div class="game-container">
         <div class="game-placeholder">
           <div class="game-screen">
+
             <img src="img/Videogame/Videogame-preview.jpg" alt="Pantalla del juego" id="gamePreviewImage">
             <div id="shareContainer" class="share-container">
               <h3>Compartir este juego</h3>
@@ -227,7 +228,29 @@
                 </a>
               </div>
             </div>
-            
+             <!-- START MENU -->
+              <div class="start-menu" id="startMenu" style="display:none;">
+                <div class="menu-content">
+                  <h1>¡Bienvenido al Juego!</h1>
+                  <button id="startGameBtn">Jugar</button>
+                  <button id="howToPlayBtn">Cómo jugar</button>
+                </div>
+              </div>
+<div class="how-to-play" id="howToPlay" style="display:none;">
+  <div class="how-to-play-box">
+    <h2>Cómo jugar</h2>
+    <p>Selecciona una ficha y salta sobre otra en línea recta hasta un espacio vacío. El objetivo es dejar solo una ficha en el tablero.</p>
+    <button id="closeHowToPlay">Cerrar</button>
+  </div>
+</div>
+
+<div class="start-menu" id="endMenu" style="display:none;">
+  <div class="menu-content">
+    <h1>💀 ¡Perdiste! 💀</h1>
+    <p id="endMessage" style="font-size: 1.2rem; margin-bottom: 20px;">Puntaje final: 0</p>
+    <button id="restartGameBtn">Reintentar</button>
+  </div>
+</div>
                   <div id="game-container-dom">
                   <div id="bg-sky" class="layer"></div>
                   <div id="bg-mountains" class="layer"></div>
@@ -446,7 +469,6 @@
 
 
   <script src="js/script.js"></script> 
-  <script src="js/videogame.js"></script>
   <script src="js/bird.js"></script>
 </body>
 </html>
