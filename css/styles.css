@@ -1736,7 +1736,7 @@ section h2 {
 }
 
 #calvo.dead {
-  background-image: url('../img/Flappy/calvoMuerte.png') ;
+  background-image: url('../img/Flappy/CalvoMuerte.png') ;
   width: 100px;
   height: 100px;
   animation: deathAnimation 0.8s steps(7  ) forwards;
