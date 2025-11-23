@@ -1687,9 +1687,7 @@ section h2 {
   height: 100px; 
   background: url('../img/Flappy/piso1.png');
   background-repeat: repeat-x; 
-  background-size: auto 100px;
   image-rendering: pixelated; 
-
   animation: moveGround 3s linear infinite;
   z-index: 10; 
 }
@@ -1736,7 +1734,7 @@ section h2 {
 }
 
 #calvo.dead {
-  background-image: url('../img/Flappy/CalvoMuerte.png') ;
+  background-image: url('../img/Flappy/calvoMuerte.png') ;
   width: 100px;
   height: 100px;
   animation: deathAnimation 0.8s steps(7  ) forwards;

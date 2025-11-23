@@ -410,19 +410,22 @@ document.addEventListener("DOMContentLoaded", () => {
     // ====================================================
     //  MUERTE Y FINAL
     // ====================================================
-    function muertePelado() {
-        if (!gameRunning) return;
-        gameRunning = false;
-        
-        if (gameLoopId) cancelAnimationFrame(gameLoopId);
-        if (obstacleInterval) clearInterval(obstacleInterval);
-        
-        calvo.classList.add("dead");
-        piso.style.animationPlayState = "paused";
-        pauseParallax();
-        
+  function muertePelado() {
+    if (!gameRunning) return;
+    gameRunning = false;
+    
+    if (gameLoopId) cancelAnimationFrame(gameLoopId);
+    if (obstacleInterval) clearInterval(obstacleInterval);
+    
+    calvo.classList.add("dead");
+    piso.style.animationPlayState = "paused";
+    pauseParallax();
+    
+    // CAMBIO AQUÍ: Esperamos 1 segundo antes de mostrar el menú
+    setTimeout(() => {
         showEndMenu();
-    }
+    }, 1000); 
+}
 
     function showEndMenu() {
         if(endMessage) endMessage.innerText = `Hiciste un total de ${score} puntos`;
