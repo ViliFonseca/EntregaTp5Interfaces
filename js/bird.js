@@ -1,5 +1,5 @@
 // =========================================
-// FUNCIONES DE UI (TRANSICIONES)
+// CAMBIOS DE PANTALLA
 // =========================================
 
 function switchScreens(hideElement, showElement, duration = 300) {
@@ -34,17 +34,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const previewImage = document.getElementById("gamePreviewImage");
     const scoreDisplay = document.getElementById("score-display"); 
 
-    // --- 1. FLUJO DE MENÚS ---
-
-    // Portada -> Menú Inicio
+    // - FLUJO DE MENÚS -
     if(playButton) {
         playButton.addEventListener("click", () => {
             if (previewImage) previewImage.style.display = "none";
             switchScreens(overlay, startMenu, 300);
         });
     }
-
-    // Menú Inicio -> Jugar
     if(startGameBtn) {
         startGameBtn.addEventListener("click", () => {
             startMenu.style.opacity = "0";
@@ -75,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- 2. BOTONES "CÓMO JUGAR" ---
+    // ---BOTONES "CÓMO JUGAR" ---
     if(howToPlayBtn) {
         howToPlayBtn.addEventListener("click", () => {
             howToPlay.style.display = "flex";
@@ -88,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- 3. CONFIGURACIÓN INICIAL JUEGO ---
+    // --- CONFIGURACIÓN INICIAL JUEGO ---
     const calvo = document.getElementById("calvo");
     const piso = document.getElementById("piso");
     // const gameScreen = document.querySelector(".game-screen"); // Usaremos gameContainer directamente para cálculos
@@ -105,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const calvoX = 100; 
 
     // Pipes y Monedas
-    const pipeWidth = 60;
+    const pipeWidth = 50;
     let pipespeed = 4;
     const pipes = [];
     const coins = [];
@@ -131,9 +127,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // ====================================================
-    //  LÓGICA DEL JUEGO
-    // ====================================================
+    // ====================
+    //   LÓGICA DEL JUEGO
+    // ====================
 
     function initGameLogic() {
         if(calvo) {
@@ -210,8 +206,7 @@ document.addEventListener("DOMContentLoaded", () => {
             let pos = parseFloat(el.dataset.pos || "0");
             pos -= pipespeed * layer.speed; 
             
-            // Reiniciar posición para evitar números gigantes (loop visual)
-            // Asumimos que el background se repite
+      
             if (pos <= -3000) pos = 0; 
 
             el.dataset.pos = pos;
@@ -223,9 +218,9 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll(".layer").forEach(layer => layer.dataset.paused = "true");
     }
 
-    // ====================================================
-    //  GAME LOOP
-    // ====================================================
+    // ================
+    //      GAME LOOP
+    // ================
     function gameLoop() {
         if (!gameRunning) return;
         velocity += gravity;
@@ -253,9 +248,9 @@ document.addEventListener("DOMContentLoaded", () => {
         calvo.style.top = calvoY + "px";
         gameLoopId = requestAnimationFrame(gameLoop);
     }
-    // ====================================================
-    //  GENERADOR DE OBSTÁCULOS
-    // ====================================================
+    // ==============================
+    //      GENERADOR DE OBSTÁCULOS
+    // ==============================
     function createObstacle() {
         if (!gameRunning) return;
 
@@ -263,10 +258,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const gameHeight = gameContainer.clientHeight;
         const pisoHeight = piso.clientHeight;
 
-        const minHeight = 50;
+        const minHeight = 80;
         const maxHeight = gameHeight - pisoHeight - pipeGap - minHeight;
-        
-        // Evitar errores si la pantalla es muy chica
         if (maxHeight < minHeight) return; 
 
         const pipeTopHeight = Math.floor(Math.random() * (maxHeight - minHeight + 1)) + minHeight;
@@ -276,14 +269,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Crear elementos DOM
         const topPipe = document.createElement("img");
-        topPipe.src = "img/Flappy/pipe-top.png"; 
+        topPipe.src = "img/Flappy/spike_top.png"; 
         topPipe.classList.add("pipe", "top");
         topPipe.style.height = pipeTopHeight + "px";
         topPipe.style.left = gameContainer.clientWidth + "px";
         topPipe.style.width = pipeWidth + "px";
 
         const bottomPipe = document.createElement("img");
-        bottomPipe.src = "img/Flappy/pipe-bottom.png";
+        bottomPipe.src = "img/Flappy/obstaculo_bajo.png";
         bottomPipe.classList.add("pipe", "bottom");
         bottomPipe.style.top = bottomPipeTop + "px";
         bottomPipe.style.height = bottomPipeHeight + "px";
@@ -326,15 +319,11 @@ document.addEventListener("DOMContentLoaded", () => {
             pipe.x -= pipespeed;
             pipe.topPipe.style.left = pipe.x + "px";
             pipe.bottomPipe.style.left = pipe.x + "px";
-
-            // Puntaje al pasar tubería
             if (!pipe.passed && (pipe.x + pipeWidth) < calvoX) {
                 score += 1; 
                 pipe.passed = true;
                 updateScoreUI();
             }
-
-            // Eliminar si sale de pantalla
             if (pipe.x < -pipeWidth) {
                 pipe.topPipe.remove();
                 pipe.bottomPipe.remove();
@@ -421,7 +410,7 @@ document.addEventListener("DOMContentLoaded", () => {
     piso.style.animationPlayState = "paused";
     pauseParallax();
     
-    // CAMBIO AQUÍ: Esperamos 1 segundo antes de mostrar el menú
+    // Esperamos 1 segundo antes de mostrar el menú
     setTimeout(() => {
         showEndMenu();
     }, 1000); 

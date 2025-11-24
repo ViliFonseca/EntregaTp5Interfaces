@@ -1726,7 +1726,6 @@ section h2 {
 
 .pipe.top {
   top: 0;
-  transform: rotate(180deg);  
 }
 
 .pipe.bottom {
@@ -1738,6 +1737,7 @@ section h2 {
   width: 100px;
   height: 100px;
   animation: deathAnimation 0.8s steps(7  ) forwards;
+  
 }
 @keyframes deathAnimation {
    0% { background-position: 0px; }
