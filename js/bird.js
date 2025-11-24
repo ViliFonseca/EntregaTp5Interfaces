@@ -87,8 +87,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- CONFIGURACIÓN INICIAL JUEGO ---
     const calvo = document.getElementById("calvo");
     const piso = document.getElementById("piso");
-    // const gameScreen = document.querySelector(".game-screen"); // Usaremos gameContainer directamente para cálculos
-    
     // Físicas y estado
     const gravity = 0.5;
     const jump = -8;
@@ -101,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const calvoX = 100; 
 
     // Pipes y Monedas
-    const pipeWidth = 50;
+    const pipeWidth = 60;
     let pipespeed = 4;
     const pipes = [];
     const coins = [];
@@ -188,32 +186,42 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 2000);
     }
 
-    // ====================================================
+    // ================
     //  PARALLAX
-    // ====================================================
-    const parallaxLayers = [
-        { id: "bg-sky", speed: 0.10 },
-        { id: "bg-mountains", speed: 0.25 },
-        { id: "bg-clouds", speed: 0.45 },
-        { id: "bg-forest-front", speed: 0.75 }
-    ];
+    // ================
+ // En bird.js
 
-    function updateParallax() {
-        parallaxLayers.forEach(layer => {
-            const el = document.getElementById(layer.id);
-            if (!el || el.dataset.paused === "true") return;
-            
-            let pos = parseFloat(el.dataset.pos || "0");
-            pos -= pipespeed * layer.speed; 
-            
-      
-            if (pos <= -3000) pos = 0; 
+const parallaxLayers = [
+    // EJEMPLO: Si cielo.png mide 800 ancho x 400 alto:
+    { id: "bg-sky", speed: 0.10, width: 576, height: 324 }, 
+    
+    // EJEMPLO: Si montana.png mide 1200 ancho x 600 alto:
+    { id: "bg-mountains", speed: 0.25, width: 576, height: 324},
+    
+    // Haz lo mismo con las otras capas...
+    { id: "bg-clouds", speed: 0.45, width: 576, height: 324 }, 
+    { id: "bg-forest-front", speed: 0.75, width: 576, height: 324 }
+];
 
-            el.dataset.pos = pos;
-            el.style.backgroundPosition = `${pos}px 0px`;
-        });
+  function updateParallax() {
+    // Obtenemos la altura actual de la ventana del juego
+    const gameHeight = gameContainer.clientHeight; 
+
+    parallaxLayers.forEach(layer => {
+        const el = document.getElementById(layer.id);
+        if (!el || el.dataset.paused === "true") return;
+        const ratio = layer.width / layer.height;
+        const renderedWidth = gameHeight * ratio;
+        let pos = parseFloat(el.dataset.pos || "0");
+        pos -= pipespeed * layer.speed; 
+        if (pos <= -renderedWidth) {
+            pos += renderedWidth; 
+        }
+
+        el.dataset.pos = pos;
+        el.style.backgroundPosition = `${pos}px 0px`;
+    });
     }
-
     function pauseParallax() {
         document.querySelectorAll(".layer").forEach(layer => layer.dataset.paused = "true");
     }
@@ -251,55 +259,84 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==============================
     //      GENERADOR DE OBSTÁCULOS
     // ==============================
-    function createObstacle() {
-        if (!gameRunning) return;
+   function createObstacle() {
+    if (!gameRunning) return;
+    const pipeWidth = 50;
+    const spikeHeadHeight = 50; 
+    const minBodyHeight = 20; 
+    const minHeight = spikeHeadHeight + minBodyHeight; 
+    const pipeGap = 300; 
+    const gameHeight = gameContainer.clientHeight;
+    const pisoHeight = piso.clientHeight;
+    const maxTopHeight = gameHeight - pisoHeight - pipeGap - minHeight;
+    if (maxTopHeight < minHeight) return;
+    const pipeTopHeight = Math.floor(Math.random() * (maxTopHeight - minHeight + 1)) + minHeight;
+    const bottomPipeTop = pipeTopHeight + pipeGap;
+    const bottomPipeHeight = gameHeight - bottomPipeTop - pisoHeight;
 
-        const pipeGap = 170; 
-        const gameHeight = gameContainer.clientHeight;
-        const pisoHeight = piso.clientHeight;
+    // ===========================================
+    // CREAR Punta
+    // ===========================================
+    const topContainer = document.createElement("div");
+    topContainer.classList.add("pipe-container");
+    topContainer.style.height = pipeTopHeight + "px";
+    topContainer.style.left = gameContainer.clientWidth + "px";
+    topContainer.style.top = "0px";
 
-        const minHeight = 80;
-        const maxHeight = gameHeight - pisoHeight - pipeGap - minHeight;
-        if (maxHeight < minHeight) return; 
+    // Crear Cuerpo (Madera)
+    const topBody = document.createElement("div");
+    topBody.classList.add("pipe-body");
+    
+    // Crear Punta (Spike)
+    const topHead = document.createElement("img");
+    topHead.src = "img/Flappy/spike.png"; 
+    topHead.classList.add("pipe-head");
+    topContainer.appendChild(topBody);
+    topContainer.appendChild(topHead);
 
-        const pipeTopHeight = Math.floor(Math.random() * (maxHeight - minHeight + 1)) + minHeight;
 
-        const bottomPipeTop = pipeTopHeight + pipeGap;
-        const bottomPipeHeight = gameHeight - bottomPipeTop - pisoHeight;
+    // ===========================================
+    // crear obstaculo
+    // ===========================================
+    const bottomContainer = document.createElement("div");
+    bottomContainer.classList.add("pipe-container");
+    bottomContainer.style.height = bottomPipeHeight + "px";
+    bottomContainer.style.left = gameContainer.clientWidth + "px";
+    bottomContainer.style.top = bottomPipeTop + "px";
 
-        // Crear elementos DOM
-        const topPipe = document.createElement("img");
-        topPipe.src = "img/Flappy/spike_top.png"; 
-        topPipe.classList.add("pipe", "top");
-        topPipe.style.height = pipeTopHeight + "px";
-        topPipe.style.left = gameContainer.clientWidth + "px";
-        topPipe.style.width = pipeWidth + "px";
+    // Crear Punta 
+    const bottomHead = document.createElement("img");
+    bottomHead.src = "img/Flappy/spike_down.png"; // Tu imagen actual
+    bottomHead.classList.add("pipe-head");
 
-        const bottomPipe = document.createElement("img");
-        bottomPipe.src = "img/Flappy/obstaculo_bajo.png";
-        bottomPipe.classList.add("pipe", "bottom");
-        bottomPipe.style.top = bottomPipeTop + "px";
-        bottomPipe.style.height = bottomPipeHeight + "px";
-        bottomPipe.style.left = gameContainer.clientWidth + "px";
-        bottomPipe.style.width = pipeWidth + "px";
+    // Crear Cuerpo (Madera)
+    const bottomBody = document.createElement("div");
+    bottomBody.classList.add("pipe-body");
 
-        gameContainer.appendChild(topPipe);
-        gameContainer.appendChild(bottomPipe);
+    // Ensamblar Abajo (Primero punta, luego madera )
+    bottomContainer.appendChild(bottomHead);
+    bottomContainer.appendChild(bottomBody);
 
-        pipes.push({ 
-            topPipe, 
-            bottomPipe, 
-            x: gameContainer.clientWidth, 
-            pipeTopHeight,
-            pipeGap,
-            passed: false 
-        });
 
-        // Monedas (20% probabilidad)
-        if (Math.random() > 0.8) {
-            createCoin(gameContainer.clientWidth + (pipeWidth / 2) - 16, pipeTopHeight + (pipeGap / 2) - 16);
-        }
+    // ===========================================
+    // 3. AGREGAR AL JUEGO Y AL ARRAY
+    // ===========================================
+    gameContainer.appendChild(topContainer);
+    gameContainer.appendChild(bottomContainer);
+
+    pipes.push({ 
+        topPipe: topContainer,      
+        bottomPipe: bottomContainer,
+        x: gameContainer.clientWidth, 
+        pipeTopHeight: pipeTopHeight,
+        pipeGap: pipeGap,
+        passed: false 
+    });
+
+    if (Math.random() > 0.8) {
+        createCoin(gameContainer.clientWidth + (pipeWidth / 2) - 16, pipeTopHeight + (pipeGap / 2) - 16);
     }
+}
 
     function createCoin(x, y) {
         const coinEl = document.createElement("div");
@@ -428,4 +465,4 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-});
+}); 
