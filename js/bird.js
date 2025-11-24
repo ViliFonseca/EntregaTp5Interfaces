@@ -166,12 +166,10 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll(".layer").forEach(l => {
             l.dataset.pos = "0";
             l.style.backgroundPosition = "0px 0px";
-            l.dataset.paused = "false"; // Asegurar que no estén pausados
+            l.dataset.paused = "false"; 
         });
 
         gameRunning = true;
-
-        // Asegurar que no haya loops previos corriendo
         if (gameLoopId) cancelAnimationFrame(gameLoopId);
         if (obstacleInterval) clearInterval(obstacleInterval);
 
@@ -189,22 +187,16 @@ document.addEventListener("DOMContentLoaded", () => {
     // ================
     //  PARALLAX
     // ================
- // En bird.js
 
 const parallaxLayers = [
-    // EJEMPLO: Si cielo.png mide 800 ancho x 400 alto:
-    { id: "bg-sky", speed: 0.10, width: 576, height: 324 }, 
-    
-    // EJEMPLO: Si montana.png mide 1200 ancho x 600 alto:
+
+    { id: "bg-sky", speed: 0.10, width: 576, height: 324 },
     { id: "bg-mountains", speed: 0.25, width: 576, height: 324},
-    
-    // Haz lo mismo con las otras capas...
     { id: "bg-clouds", speed: 0.45, width: 576, height: 324 }, 
     { id: "bg-forest-front", speed: 0.75, width: 576, height: 324 }
 ];
 
   function updateParallax() {
-    // Obtenemos la altura actual de la ventana del juego
     const gameHeight = gameContainer.clientHeight; 
 
     parallaxLayers.forEach(layer => {
@@ -306,7 +298,7 @@ const parallaxLayers = [
 
     // Crear Punta 
     const bottomHead = document.createElement("img");
-    bottomHead.src = "img/Flappy/spike_down.png"; // Tu imagen actual
+    bottomHead.src = "img/Flappy/spike_down.png";
     bottomHead.classList.add("pipe-head");
 
     // Crear Cuerpo (Madera)
@@ -446,8 +438,6 @@ const parallaxLayers = [
     calvo.classList.add("dead");
     piso.style.animationPlayState = "paused";
     pauseParallax();
-    
-    // Esperamos 1 segundo antes de mostrar el menú
     setTimeout(() => {
         showEndMenu();
     }, 1000); 
