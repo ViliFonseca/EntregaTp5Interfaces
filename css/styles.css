@@ -767,7 +767,7 @@ section h2 {
   display: none;
   flex-direction: column;
   gap: 10px;
-  z-index: 2;
+  z-index: 15;
   min-width: 250px;
   max-width: 400px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.5);

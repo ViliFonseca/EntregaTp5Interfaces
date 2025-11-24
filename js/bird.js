@@ -11,11 +11,38 @@ function switchScreens(hideElement, showElement, duration = 300) {
     }, duration);
 }
 
+function showShare() {
+    const shareContainer = document.getElementById("shareContainer");
+    shareContainer.style.display = shareContainer.style.display === "flex" ? "none" : "flex";
+}
+function fullscreen() {
+    const gameScreen = document.querySelector(".game-screen");
+    if (!document.fullscreenElement) {
+        gameScreen.requestFullscreen()
+            .catch(err => console.log(`Error al entrar en fullscreen: ${err.message}`));
+    } else {
+        document.exitFullscreen();
+    }
+}
+
+function activarCorazonToggle(selector) {
+  const btn = document.querySelector(selector);
+
+  btn.addEventListener('click', () => {
+    btn.classList.toggle('liked');
+    if (btn.classList.contains('liked')) {
+      btn.classList.add('animate');
+      setTimeout(() => btn.classList.remove('animate'), 400);
+    }
+  });
+}
+
 // =========================================
 // INICIALIZACIÓN Y EVENTOS DOM
 // =========================================
 
 document.addEventListener("DOMContentLoaded", () => {
+     activarCorazonToggle('#likeBtn');
     // --- Referencias DOM ---
     const playButton = document.getElementById("playButton");
     const startGameBtn = document.getElementById("startGameBtn");
@@ -34,6 +61,25 @@ document.addEventListener("DOMContentLoaded", () => {
     const previewImage = document.getElementById("gamePreviewImage");
     const scoreDisplay = document.getElementById("score-display"); 
 
+      // --- 4. BOTONES (COMPARTIR, FULLSCREEN) ---
+    const shareBtn = document.getElementById("shareBtn");
+    const closeShare = document.getElementById("closeShare");
+    shareBtn.addEventListener("click", showShare);
+    closeShare.addEventListener("click", () => {
+        document.getElementById("shareContainer").style.display = "none";
+    });
+
+    const fullscreenBtn = document.getElementById("fullscreenBtn");
+    fullscreenBtn.addEventListener("click", fullscreen);
+    document.addEventListener("fullscreenchange", () => {
+        if (!document.fullscreenElement) {
+            const gameScreen = document.querySelector(".game-screen");
+            gameScreen.style.width = "1080px";
+            gameScreen.style.height = "607px";
+            gameScreen.style.maxWidth = "1080px";
+            gameScreen.style.maxHeight = "607px";
+        }
+    });
     // - FLUJO DE MENÚS -
     if(playButton) {
         playButton.addEventListener("click", () => {
