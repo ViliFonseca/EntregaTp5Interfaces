@@ -1750,52 +1750,70 @@ section h2 {
   100% { background-position: -700px}
 }
 
-
+/* ============================
+   PARALLAX FLAPPY 
+=============================== */
 .layer {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 300%;              
-  height: 100%;
+  inset: 0;
   background-repeat: repeat-x;
-  background-size: auto 100%;  
-  background-position: 0 0;
-  pointer-events: none;
-  z-index: 0;
+
+  background-size: 576px 100%; 
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
 }
+/*Cielo */
 #bg-sky {
-  background-image: url('../img/Flappy/cielo.png');
+  background-image: url("../img/Flappy/cielo.png");
+  animation-name: parallaxSky;
+  animation-duration: 60s; 
 }
 
+/* Montañas */
 #bg-mountains {
-  background-image: url('../img/Flappy/montaña.png');
+  background-image: url("../img/Flappy/montaña.png");
+  animation-name: parallaxMountains;
+  animation-duration: 30s;
 }
 
+/*Nubes */
 #bg-clouds {
-  background-image: url('../img/Flappy/nubes.png');
+  background-image: url("../img/Flappy/nubes.png");
+  animation-name: parallaxClouds;
+  animation-duration: 15s;
 }
 
 #bg-forest-front {
-  background-image: url('../img/Flappy/arboles.png');
-  top: -90px;
+  background-image: url("../img/Flappy/arboles.png");
+  animation-name: parallaxForest;
+  animation-duration: 8s;
+  background-position: left bottom 70px; 
 }
 
-/* KEYFRAMES */
-@keyframes moveSky {
-  from { background-position: 0; }
-  to   { background-position: -1000px; }
+/* ANIMACIONES*/
+@keyframes parallaxSky {
+  from { background-position-x: 0; }
+  to   { background-position-x: -576px; }
 }
-@keyframes moveMountains {
-  from { background-position: 0; }
-  to   { background-position: -1500px; }
+
+@keyframes parallaxMountains {
+  from { background-position-x: 0; }
+  to   { background-position-x: -576px; }
 }
-@keyframes moveClouds {
-  from { background-position: 0; }
-  to   { background-position: -2000px; }
+
+@keyframes parallaxClouds {
+  from { background-position-x: 0; }
+  to   { background-position-x: -576px; }
 }
-@keyframes moveForestFront {
-  from { background-position: 0; }
-  to   { background-position: -3000px; }
+
+@keyframes parallaxForest {
+  from { background-position-x: 0; }
+  to   { background-position-x: -576px; }
+}
+
+/* PAUSA AUTOMÁTICA AL MORIR */
+.layer.paused {
+  animation-play-state: paused;
 }
 
 /* =========================================
@@ -1820,7 +1838,7 @@ section h2 {
   position: absolute;
   width: 30px;
   height: 30px; 
-  background-image: url('../img/Flappy/MonedaD.png'); /* Asegúrate de tener esta imagen */
+  background-image: url('../img/Flappy/MonedaD.png'); 
   background-repeat: no-repeat;
   z-index: 9;
   animation: spinCoin 0.8s steps(5) infinite; 
