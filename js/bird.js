@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
             startMenu.style.opacity = "0";
             setTimeout(() => {
                 startMenu.style.display = "none";
-                gameContainer.style.display = "block"; 
+                gameContainer.style.display = "flex"; 
                 gameContainer.style.opacity = "1";
                 scoreDisplay.style.display = "block";
                 
@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
             setTimeout(() => {
                 endMenu.style.display = "none";
                 // Aseguramos que el contenedor del juego esté visible
-                gameContainer.style.display = "block"; 
+                gameContainer.style.display = "flex"; 
                 scoreDisplay.style.display = "block";
                 // Reiniciamos la lógica
                 initGameLogic();
@@ -91,7 +91,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- 3. CONFIGURACIÓN INICIAL JUEGO ---
     const calvo = document.getElementById("calvo");
     const piso = document.getElementById("piso");
-    // const gameScreen = document.querySelector(".game-screen"); // Usaremos gameContainer directamente para cálculos
     
     // Físicas y estado
     const gravity = 0.5;
