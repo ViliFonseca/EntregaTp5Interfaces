@@ -1,5 +1,5 @@
 // =========================================
-// FUNCIONES DE UI (TRANSICIONES)
+// CAMBIOS DE PANTALLA
 // =========================================
 
 function switchScreens(hideElement, showElement, duration = 300) {
@@ -11,11 +11,38 @@ function switchScreens(hideElement, showElement, duration = 300) {
     }, duration);
 }
 
+function showShare() {
+    const shareContainer = document.getElementById("shareContainer");
+    shareContainer.style.display = shareContainer.style.display === "flex" ? "none" : "flex";
+}
+function fullscreen() {
+    const gameScreen = document.querySelector(".game-screen");
+    if (!document.fullscreenElement) {
+        gameScreen.requestFullscreen()
+            .catch(err => console.log(`Error al entrar en fullscreen: ${err.message}`));
+    } else {
+        document.exitFullscreen();
+    }
+}
+
+function activarCorazonToggle(selector) {
+  const btn = document.querySelector(selector);
+
+  btn.addEventListener('click', () => {
+    btn.classList.toggle('liked');
+    if (btn.classList.contains('liked')) {
+      btn.classList.add('animate');
+      setTimeout(() => btn.classList.remove('animate'), 400);
+    }
+  });
+}
+
 // =========================================
 // INICIALIZACIÓN Y EVENTOS DOM
 // =========================================
 
 document.addEventListener("DOMContentLoaded", () => {
+     activarCorazonToggle('#likeBtn');
     // --- Referencias DOM ---
     const playButton = document.getElementById("playButton");
     const startGameBtn = document.getElementById("startGameBtn");
@@ -34,17 +61,32 @@ document.addEventListener("DOMContentLoaded", () => {
     const previewImage = document.getElementById("gamePreviewImage");
     const scoreDisplay = document.getElementById("score-display"); 
 
-    // --- 1. FLUJO DE MENÚS ---
+      // --- 4. BOTONES (COMPARTIR, FULLSCREEN) ---
+    const shareBtn = document.getElementById("shareBtn");
+    const closeShare = document.getElementById("closeShare");
+    shareBtn.addEventListener("click", showShare);
+    closeShare.addEventListener("click", () => {
+        document.getElementById("shareContainer").style.display = "none";
+    });
 
-    // Portada -> Menú Inicio
+    const fullscreenBtn = document.getElementById("fullscreenBtn");
+    fullscreenBtn.addEventListener("click", fullscreen);
+    document.addEventListener("fullscreenchange", () => {
+        if (!document.fullscreenElement) {
+            const gameScreen = document.querySelector(".game-screen");
+            gameScreen.style.width = "1080px";
+            gameScreen.style.height = "607px";
+            gameScreen.style.maxWidth = "1080px";
+            gameScreen.style.maxHeight = "607px";
+        }
+    });
+    // - FLUJO DE MENÚS -
     if(playButton) {
         playButton.addEventListener("click", () => {
             if (previewImage) previewImage.style.display = "none";
             switchScreens(overlay, startMenu, 300);
         });
     }
-
-    // Menú Inicio -> Jugar
     if(startGameBtn) {
         startGameBtn.addEventListener("click", () => {
             startMenu.style.opacity = "0";
@@ -75,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- 2. BOTONES "CÓMO JUGAR" ---
+    // ---BOTONES "CÓMO JUGAR" ---
     if(howToPlayBtn) {
         howToPlayBtn.addEventListener("click", () => {
             howToPlay.style.display = "flex";
@@ -88,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- 3. CONFIGURACIÓN INICIAL JUEGO ---
+    // --- CONFIGURACIÓN INICIAL JUEGO ---
     const calvo = document.getElementById("calvo");
     const piso = document.getElementById("piso");
     
@@ -130,9 +172,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // ====================================================
-    //  LÓGICA DEL JUEGO
-    // ====================================================
+    // ====================
+    //   LÓGICA DEL JUEGO
+    // ====================
 
     function initGameLogic() {
         if(calvo) {
@@ -171,12 +213,10 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll(".layer").forEach(l => {
             l.dataset.pos = "0";
             l.style.backgroundPosition = "0px 0px";
-            l.dataset.paused = "false"; // Asegurar que no estén pausados
+            l.dataset.paused = "false"; 
         });
 
         gameRunning = true;
-
-        // Asegurar que no haya loops previos corriendo
         if (gameLoopId) cancelAnimationFrame(gameLoopId);
         if (obstacleInterval) clearInterval(obstacleInterval);
 
@@ -191,40 +231,43 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 2000);
     }
 
-    // ====================================================
+    // ================
     //  PARALLAX
-    // ====================================================
-    const parallaxLayers = [
-        { id: "bg-sky", speed: 0.10 },
-        { id: "bg-mountains", speed: 0.25 },
-        { id: "bg-clouds", speed: 0.45 },
-        { id: "bg-forest-front", speed: 0.75 }
-    ];
+    // ================
 
-    function updateParallax() {
-        parallaxLayers.forEach(layer => {
-            const el = document.getElementById(layer.id);
-            if (!el || el.dataset.paused === "true") return;
-            
-            let pos = parseFloat(el.dataset.pos || "0");
-            pos -= pipespeed * layer.speed; 
-            
-            // Reiniciar posición para evitar números gigantes (loop visual)
-            // Asumimos que el background se repite
-            if (pos <= -3000) pos = 0; 
+const parallaxLayers = [
 
-            el.dataset.pos = pos;
-            el.style.backgroundPosition = `${pos}px 0px`;
-        });
+    { id: "bg-sky", speed: 0.10, width: 576, height: 324 },
+    { id: "bg-mountains", speed: 0.25, width: 576, height: 324},
+    { id: "bg-clouds", speed: 0.45, width: 576, height: 324 }, 
+    { id: "bg-forest-front", speed: 0.75, width: 576, height: 324 }
+];
+
+  function updateParallax() {
+    const gameHeight = gameContainer.clientHeight; 
+
+    parallaxLayers.forEach(layer => {
+        const el = document.getElementById(layer.id);
+        if (!el || el.dataset.paused === "true") return;
+        const ratio = layer.width / layer.height;
+        const renderedWidth = gameHeight * ratio;
+        let pos = parseFloat(el.dataset.pos || "0");
+        pos -= pipespeed * layer.speed; 
+        if (pos <= -renderedWidth) {
+            pos += renderedWidth; 
+        }
+
+        el.dataset.pos = pos;
+        el.style.backgroundPosition = `${pos}px 0px`;
+    });
     }
-
     function pauseParallax() {
         document.querySelectorAll(".layer").forEach(layer => layer.dataset.paused = "true");
     }
 
-    // ====================================================
-    //  GAME LOOP
-    // ====================================================
+    // ================
+    //      GAME LOOP
+    // ================
     function gameLoop() {
         if (!gameRunning) return;
         velocity += gravity;
@@ -252,60 +295,87 @@ document.addEventListener("DOMContentLoaded", () => {
         calvo.style.top = calvoY + "px";
         gameLoopId = requestAnimationFrame(gameLoop);
     }
-    // ====================================================
-    //  GENERADOR DE OBSTÁCULOS
-    // ====================================================
-    function createObstacle() {
-        if (!gameRunning) return;
+    // ==============================
+    //      GENERADOR DE OBSTÁCULOS
+    // ==============================
+   function createObstacle() {
+    if (!gameRunning) return;
+    const pipeWidth = 50;
+    const spikeHeadHeight = 50; 
+    const minBodyHeight = 20; 
+    const minHeight = spikeHeadHeight + minBodyHeight; 
+    const pipeGap = 300; 
+    const gameHeight = gameContainer.clientHeight;
+    const pisoHeight = piso.clientHeight;
+    const maxTopHeight = gameHeight - pisoHeight - pipeGap - minHeight;
+    if (maxTopHeight < minHeight) return;
+    const pipeTopHeight = Math.floor(Math.random() * (maxTopHeight - minHeight + 1)) + minHeight;
+    const bottomPipeTop = pipeTopHeight + pipeGap;
+    const bottomPipeHeight = gameHeight - bottomPipeTop - pisoHeight;
 
-        const pipeGap = 170; 
-        const gameHeight = gameContainer.clientHeight;
-        const pisoHeight = piso.clientHeight;
+    // ===========================================
+    // CREAR Punta
+    // ===========================================
+    const topContainer = document.createElement("div");
+    topContainer.classList.add("pipe-container");
+    topContainer.style.height = pipeTopHeight + "px";
+    topContainer.style.left = gameContainer.clientWidth + "px";
+    topContainer.style.top = "0px";
 
-        const minHeight = 50;
-        const maxHeight = gameHeight - pisoHeight - pipeGap - minHeight;
-        
-        // Evitar errores si la pantalla es muy chica
-        if (maxHeight < minHeight) return; 
+    // Crear Cuerpo (Madera)
+    const topBody = document.createElement("div");
+    topBody.classList.add("pipe-body");
+    
+    // Crear Punta (Spike)
+    const topHead = document.createElement("img");
+    topHead.src = "img/Flappy/spike.png"; 
+    topHead.classList.add("pipe-head");
+    topContainer.appendChild(topBody);
+    topContainer.appendChild(topHead);
 
-        const pipeTopHeight = Math.floor(Math.random() * (maxHeight - minHeight + 1)) + minHeight;
 
-        const bottomPipeTop = pipeTopHeight + pipeGap;
-        const bottomPipeHeight = gameHeight - bottomPipeTop - pisoHeight;
+    // ===========================================
+    // crear obstaculo
+    // ===========================================
+    const bottomContainer = document.createElement("div");
+    bottomContainer.classList.add("pipe-container");
+    bottomContainer.style.height = bottomPipeHeight + "px";
+    bottomContainer.style.left = gameContainer.clientWidth + "px";
+    bottomContainer.style.top = bottomPipeTop + "px";
 
-        // Crear elementos DOM
-        const topPipe = document.createElement("img");
-        topPipe.src = "img/Flappy/pipe-top.png"; 
-        topPipe.classList.add("pipe", "top");
-        topPipe.style.height = pipeTopHeight + "px";
-        topPipe.style.left = gameContainer.clientWidth + "px";
-        topPipe.style.width = pipeWidth + "px";
+    // Crear Punta 
+    const bottomHead = document.createElement("img");
+    bottomHead.src = "img/Flappy/spike_down.png";
+    bottomHead.classList.add("pipe-head");
 
-        const bottomPipe = document.createElement("img");
-        bottomPipe.src = "img/Flappy/pipe-bottom.png";
-        bottomPipe.classList.add("pipe", "bottom");
-        bottomPipe.style.top = bottomPipeTop + "px";
-        bottomPipe.style.height = bottomPipeHeight + "px";
-        bottomPipe.style.left = gameContainer.clientWidth + "px";
-        bottomPipe.style.width = pipeWidth + "px";
+    // Crear Cuerpo (Madera)
+    const bottomBody = document.createElement("div");
+    bottomBody.classList.add("pipe-body");
 
-        gameContainer.appendChild(topPipe);
-        gameContainer.appendChild(bottomPipe);
+    // Ensamblar Abajo (Primero punta, luego madera )
+    bottomContainer.appendChild(bottomHead);
+    bottomContainer.appendChild(bottomBody);
 
-        pipes.push({ 
-            topPipe, 
-            bottomPipe, 
-            x: gameContainer.clientWidth, 
-            pipeTopHeight,
-            pipeGap,
-            passed: false 
-        });
 
-        // Monedas (20% probabilidad)
-        if (Math.random() > 0.8) {
-            createCoin(gameContainer.clientWidth + (pipeWidth / 2) - 16, pipeTopHeight + (pipeGap / 2) - 16);
-        }
+    // ===========================================
+    // 3. AGREGAR AL JUEGO Y AL ARRAY
+    // ===========================================
+    gameContainer.appendChild(topContainer);
+    gameContainer.appendChild(bottomContainer);
+
+    pipes.push({ 
+        topPipe: topContainer,      
+        bottomPipe: bottomContainer,
+        x: gameContainer.clientWidth, 
+        pipeTopHeight: pipeTopHeight,
+        pipeGap: pipeGap,
+        passed: false 
+    });
+
+    if (Math.random() > 0.8) {
+        createCoin(gameContainer.clientWidth + (pipeWidth / 2) - 16, pipeTopHeight + (pipeGap / 2) - 16);
     }
+}
 
     function createCoin(x, y) {
         const coinEl = document.createElement("div");
@@ -325,15 +395,11 @@ document.addEventListener("DOMContentLoaded", () => {
             pipe.x -= pipespeed;
             pipe.topPipe.style.left = pipe.x + "px";
             pipe.bottomPipe.style.left = pipe.x + "px";
-
-            // Puntaje al pasar tubería
             if (!pipe.passed && (pipe.x + pipeWidth) < calvoX) {
                 score += 1; 
                 pipe.passed = true;
                 updateScoreUI();
             }
-
-            // Eliminar si sale de pantalla
             if (pipe.x < -pipeWidth) {
                 pipe.topPipe.remove();
                 pipe.bottomPipe.remove();
@@ -419,8 +485,6 @@ document.addEventListener("DOMContentLoaded", () => {
     calvo.classList.add("dead");
     piso.style.animationPlayState = "paused";
     pauseParallax();
-    
-    // CAMBIO AQUÍ: Esperamos 1 segundo antes de mostrar el menú
     setTimeout(() => {
         showEndMenu();
     }, 1000); 
@@ -438,4 +502,4 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-});
+}); 
