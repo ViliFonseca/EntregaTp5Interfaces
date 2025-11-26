@@ -241,7 +241,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const spikeHeadHeight = 60;
         const minBodyHeight = 20;
         const minHeight = spikeHeadHeight + minBodyHeight;
-        const pipeGap = 200000;
+        const pipeGap = 300;
 
         const gameHeight = gameContainer.clientHeight;
         const pisoHeight = piso.clientHeight;
